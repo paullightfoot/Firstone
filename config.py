@@ -12,7 +12,13 @@ SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "paul.lightfoot@gmail.com")
 RECIPIENT_EMAILS = [e.strip() for e in os.environ.get("RECIPIENT_EMAIL", "paul.lightfoot@gmail.com").split(",")]
 
 # Database
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///roc_tracker.db")
+# On Railway: set DATABASE_URL to sqlite:////data/roc_tracker.db
+# and mount a volume at /data so the database persists across deploys.
+_db_url = os.environ.get("DATABASE_URL", "sqlite:///roc_tracker.db")
+# Railway sometimes provides postgres:// URLs — normalize if needed
+if _db_url.startswith("postgres://"):
+    _db_url = _db_url.replace("postgres://", "postgresql://", 1)
+DATABASE_URL = _db_url
 
 # Scraping
 SCRAPE_TIMEOUT = 30       # seconds per request
