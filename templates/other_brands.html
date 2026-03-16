@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+
+{% for item in cert_data %}
+<div class="section">
+  <h2 class="section-title">
+    {{ item.cert.name }}
+    <span class="count-badge">{{ item.brands|length }}</span>
+  </h2>
+  {% if item.cert.website %}
+    <p class="cert-link"><a href="{{ item.cert.website }}" target="_blank">{{ item.cert.website }}</a></p>
+  {% endif %}
+
+  {% if item.brands %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Brand</th><th>Categories</th><th>Organic?</th><th>Country</th><th>Website</th></tr>
+    </thead>
+    <tbody>
+    {% for brand in item.brands %}
+    <tr>
+      <td><a href="{{ url_for('brand_detail', brand_id=brand.id) }}">{{ brand.name }}</a></td>
+      <td>{{ (brand.categories or []) | join(', ') }}</td>
+      <td class="{% if brand.is_organic_certified %}cell-green{% endif %}">
+        {{ '✓' if brand.is_organic_certified else '' }}
+      </td>
+      <td>{{ brand.country or '—' }}</td>
+      <td>{% if brand.website %}<a href="{{ brand.website }}" target="_blank">↗</a>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty-msg">No brands scraped yet for this certification.</p>
+  {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

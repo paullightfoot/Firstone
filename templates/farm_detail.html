@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ farm.name }}{% endblock %}
+{% block content %}
+<h1 class="page-title">{{ farm.name }}</h1>
+<p><a href="javascript:history.back()">← Back</a></p>
+
+<div class="detail-grid">
+  <div class="detail-section">
+    <h2>Details</h2>
+    <dl class="detail-list">
+      <dt>Website</dt>
+      <dd>{% if farm.website %}<a href="{{ farm.website }}" target="_blank">{{ farm.website }}</a>{% else %}—{% endif %}</dd>
+      <dt>County</dt>
+      <dd>{{ farm.county or '—' }}</dd>
+      <dt>State</dt>
+      <dd>{{ farm.state or '—' }}</dd>
+      <dt>Country</dt>
+      <dd>{{ farm.country or 'USA' }}</dd>
+      <dt>Products / Crops</dt>
+      <dd>{{ (farm.categories or []) | join(', ') or '—' }}</dd>
+      <dt>Organic Certified</dt>
+      <dd class="{% if farm.is_organic_certified %}cell-green{% endif %}">
+        {{ 'Yes' if farm.is_organic_certified else 'No' }}
+      </dd>
+      <dt>Size</dt>
+      <dd>{{ (farm.size_acres | string + ' acres') if farm.size_acres else '—' }}</dd>
+      <dt>Notes</dt>
+      <dd>{{ farm.notes or '—' }}</dd>
+    </dl>
+  </div>
+
+  <div class="detail-section">
+    <h2>Certifications</h2>
+    {% if farm.certifications %}
+    <table class="data-table">
+      <thead><tr><th>Certification</th><th>Status</th><th>Certified Date</th></tr></thead>
+      <tbody>
+      {% for fc in farm.certifications %}
+      <tr>
+        <td>{{ fc.certification.name if fc.certification else '—' }}</td>
+        <td class="status-{{ fc.status }}">{{ fc.status }}</td>
+        <td>{{ fc.certified_date.strftime('%Y-%m-%d') if fc.certified_date else '—' }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty-msg">No certification records.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if county_peers or state_peers %}
+<div class="section">
+  <h2 class="section-title">🌍 Farm Community</h2>
+
+  {% if county_peers %}
+  <h3 class="sub-section-title">Same County — {{ farm.county }}, {{ farm.state }}</h3>
+  <table class="data-table">
+    <thead><tr><th>Farm</th><th>Certifications</th><th>Organic?</th></tr></thead>
+    <tbody>
+    {% for peer in county_peers %}
+    <tr>
+      <td><a href="{{ url_for('farm_detail', farm_id=peer.id) }}">{{ peer.name }}</a></td>
+      <td>{{ peer.certifications | map(attribute='certification') | selectattr('name') | map(attribute='name') | join(', ') }}</td>
+      <td class="{% if peer.is_organic_certified %}cell-green{% endif %}">{{ '✓' if peer.is_organic_certified else '' }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if state_peers %}
+  <h3 class="sub-section-title" style="margin-top:12px">Same State — {{ farm.state }}</h3>
+  <table class="data-table">
+    <thead><tr><th>Farm</th><th>County</th><th>Certifications</th></tr></thead>
+    <tbody>
+    {% for peer in state_peers %}
+    <tr>
+      <td><a href="{{ url_for('farm_detail', farm_id=peer.id) }}">{{ peer.name }}</a></td>
+      <td>{{ peer.county or '—' }}</td>
+      <td>{{ peer.certifications | map(attribute='certification') | selectattr('name') | map(attribute='name') | join(', ') }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if farm.description %}
+<div class="section">
+  <h2 class="section-title">Description</h2>
+  <p>{{ farm.description }}</p>
+</div>
+{% endif %}
+{% endblock %}

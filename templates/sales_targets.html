@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+
+<div class="filter-bar">
+  <span>Filter by priority:</span>
+  <a href="{{ url_for('sales_targets') }}" class="filter-btn {% if not request.args.get('priority') %}active{% endif %}">All</a>
+  <a href="{{ url_for('sales_targets', priority=1) }}" class="filter-btn priority-1 {% if request.args.get('priority') == '1' %}active{% endif %}">
+    Priority 1 — Organic in ROC Category
+  </a>
+  <a href="{{ url_for('sales_targets', priority=2) }}" class="filter-btn priority-2 {% if request.args.get('priority') == '2' %}active{% endif %}">
+    Priority 2 — Organic / Near ROC Farm
+  </a>
+  <a href="{{ url_for('sales_targets', priority=3) }}" class="filter-btn priority-3 {% if request.args.get('priority') == '3' %}active{% endif %}">
+    Priority 3 — Other Regen Cert
+  </a>
+</div>
+
+<p class="count-label">{{ targets|length }} target(s)</p>
+
+{% if targets %}
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Priority</th>
+      <th>Type</th>
+      <th>Name</th>
+      <th>Opportunity</th>
+      <th>Reason</th>
+      <th>ROC Role Model</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for t in targets %}
+  <tr class="priority-row-{{ t.priority }}">
+    <td class="priority-cell priority-{{ t.priority }}">P{{ t.priority }}</td>
+    <td>{{ t.entity_type }}</td>
+    <td>
+      {% if t.entity_type == 'brand' and t.brand %}
+        <a href="{{ url_for('brand_detail', brand_id=t.brand.id) }}">{{ t.brand.name }}</a>
+      {% elif t.entity_type == 'farm' and t.farm %}
+        <a href="{{ url_for('farm_detail', farm_id=t.farm.id) }}">{{ t.farm.name }}</a>
+      {% else %}—{% endif %}
+    </td>
+    <td><span class="opp-type">{{ t.opportunity_type | replace('_', ' ') }}</span></td>
+    <td class="reason-cell">{{ t.reason }}</td>
+    <td>
+      {% if t.related_roc_brand %}
+        <a href="{{ url_for('brand_detail', brand_id=t.related_roc_brand.id) }}">{{ t.related_roc_brand.name }}</a>
+      {% elif t.related_roc_farm %}
+        <a href="{{ url_for('farm_detail', farm_id=t.related_roc_farm.id) }}">{{ t.related_roc_farm.name }}</a>
+      {% else %}—{% endif %}
+    </td>
+    <td>
+      <form method="POST" action="{{ url_for('dismiss_target', target_id=t.id) }}" style="display:inline">
+        <button type="submit" class="btn btn-sm btn-muted" title="Dismiss this target">Dismiss</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty-msg">No active sales targets. Run targeting from <a href="{{ url_for('admin') }}">Admin</a>.</p>
+{% endif %}
+{% endblock %}

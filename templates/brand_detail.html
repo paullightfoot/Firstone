@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ brand.name }}{% endblock %}
+{% block content %}
+<h1 class="page-title">{{ brand.name }}</h1>
+<p><a href="javascript:history.back()">← Back</a></p>
+
+<div class="detail-grid">
+  <div class="detail-section">
+    <h2>Details</h2>
+    <dl class="detail-list">
+      <dt>Website</dt>
+      <dd>{% if brand.website %}<a href="{{ brand.website }}" target="_blank">{{ brand.website }}</a>{% else %}—{% endif %}</dd>
+      <dt>Categories</dt>
+      <dd>{{ (brand.categories or []) | join(', ') or '—' }}</dd>
+      <dt>Organic Certified</dt>
+      <dd class="{% if brand.is_organic_certified %}cell-green{% endif %}">
+        {{ 'Yes' if brand.is_organic_certified else 'No' }}
+        {% if brand.organic_cert_notes %} — {{ brand.organic_cert_notes }}{% endif %}
+      </dd>
+      <dt>Country</dt>
+      <dd>{{ brand.country or 'USA' }}</dd>
+      <dt>Notes</dt>
+      <dd>{{ brand.notes or '—' }}</dd>
+      <dt>Date Added</dt>
+      <dd>{{ brand.date_added.strftime('%Y-%m-%d') if brand.date_added else '—' }}</dd>
+    </dl>
+  </div>
+
+  <div class="detail-section">
+    <h2>Certifications</h2>
+    {% if brand.certifications %}
+    <table class="data-table">
+      <thead><tr><th>Certification</th><th>Status</th><th>Certified Date</th></tr></thead>
+      <tbody>
+      {% for bc in brand.certifications %}
+      <tr>
+        <td>{{ bc.certification.name if bc.certification else '—' }}</td>
+        <td class="status-{{ bc.status }}">{{ bc.status }}</td>
+        <td>{{ bc.certified_date.strftime('%Y-%m-%d') if bc.certified_date else '—' }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty-msg">No certification records.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if brand.description %}
+<div class="section">
+  <h2 class="section-title">Description</h2>
+  <p>{{ brand.description }}</p>
+</div>
+{% endif %}
+{% endblock %}

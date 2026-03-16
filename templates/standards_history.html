@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Standards History: {{ cert.name }}</h1>
+<p><a href="{{ url_for('standards') }}">← Back to Standards</a></p>
+
+<div class="section">
+  <h2 class="section-title">Recorded Changes</h2>
+  {% if changes %}
+  {% for chg in changes %}
+  <div class="change-card {% if chg.synthetic_fertilizer_changed or chg.synthetic_pesticide_changed %}change-alert{% endif %}">
+    <div class="change-header">
+      <strong>{{ chg.change_date.strftime('%Y-%m-%d %H:%M UTC') }}</strong>
+      {% if chg.synthetic_fertilizer_changed %}
+        <span class="badge badge-red">Synth Fert Language Changed</span>
+      {% endif %}
+      {% if chg.synthetic_pesticide_changed %}
+        <span class="badge badge-red">Synth Pest Language Changed</span>
+      {% endif %}
+    </div>
+    {% if chg.diff_summary %}
+    <pre class="diff-view">{{ chg.diff_summary[:1200] }}</pre>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="empty-msg">No changes recorded yet. Run "Check Standards" from Admin to begin monitoring.</p>
+  {% endif %}
+</div>
+
+<div class="section">
+  <h2 class="section-title">Snapshots</h2>
+  <table class="data-table">
+    <thead><tr><th>Date</th><th>Source URL</th><th>Hash</th></tr></thead>
+    <tbody>
+    {% for snap in snapshots %}
+    <tr>
+      <td>{{ snap.date_captured.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{% if snap.source_url %}<a href="{{ snap.source_url }}" target="_blank">{{ snap.source_url[:60] }}…</a>{% endif %}</td>
+      <td class="monospace">{{ snap.content_hash[:12] }}…</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+<p><a href="{{ url_for('admin') }}">← Back to Admin</a></p>
+
+<form method="POST" class="form-card">
+  <div class="form-group">
+    <label>Full Name *</label>
+    <input type="text" name="name" required class="form-input">
+  </div>
+  <div class="form-group">
+    <label>Short Name *</label>
+    <input type="text" name="short_name" required class="form-input">
+  </div>
+  <div class="form-group">
+    <label>Website</label>
+    <input type="url" name="website" class="form-input">
+  </div>
+  <div class="form-group">
+    <label>Registry URL</label>
+    <input type="url" name="registry_url" class="form-input">
+  </div>
+  <div class="form-group">
+    <label>Standards URL</label>
+    <input type="url" name="standards_url" class="form-input">
+  </div>
+  <div class="form-group">
+    <label><input type="checkbox" name="is_roc"> This is the ROC certification</label>
+  </div>
+  <button type="submit" class="btn btn-green">Add Certification</button>
+</form>
+{% endblock %}

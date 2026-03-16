@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+<p class="count-label">{{ farms|length }} certified farm(s)</p>
+
+{% if farms %}
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Farm Name</th>
+      <th>County</th>
+      <th>State</th>
+      <th>Products / Crops</th>
+      <th>Organic?</th>
+      <th>Website</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for farm in farms %}
+    <tr>
+      <td><a href="{{ url_for('farm_detail', farm_id=farm.id) }}">{{ farm.name }}</a></td>
+      <td>{{ farm.county or '—' }}</td>
+      <td>{{ farm.state or '—' }}</td>
+      <td>{{ (farm.categories or []) | join(', ') }}</td>
+      <td class="{% if farm.is_organic_certified %}cell-green{% endif %}">
+        {{ '✓' if farm.is_organic_certified else '' }}
+      </td>
+      <td>{% if farm.website %}<a href="{{ farm.website }}" target="_blank">↗</a>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty-msg">No ROC certified farms yet. Run a scrape from <a href="{{ url_for('admin') }}">Admin</a>.</p>
+{% endif %}
+{% endblock %}

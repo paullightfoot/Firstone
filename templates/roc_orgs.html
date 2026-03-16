@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+<p class="count-label">{{ orgs|length }} certified organization(s)</p>
+
+{% if orgs %}
+<table class="data-table">
+  <thead>
+    <tr><th>Name</th><th>Type</th><th>State</th><th>Country</th><th>Website</th></tr>
+  </thead>
+  <tbody>
+    {% for org in orgs %}
+    <tr>
+      <td>{{ org.name }}</td>
+      <td>{{ org.org_type or '—' }}</td>
+      <td>{{ org.state or '—' }}</td>
+      <td>{{ org.country or 'USA' }}</td>
+      <td>{% if org.website %}<a href="{{ org.website }}" target="_blank">↗</a>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty-msg">No ROC certified organizations yet.</p>
+{% endif %}
+{% endblock %}

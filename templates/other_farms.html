@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+
+{% for item in cert_data %}
+<div class="section">
+  <h2 class="section-title">
+    {{ item.cert.name }}
+    <span class="count-badge">{{ item.farms|length }}</span>
+  </h2>
+  {% if item.farms %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Farm</th><th>County</th><th>State</th><th>Products</th><th>Organic?</th></tr>
+    </thead>
+    <tbody>
+    {% for farm in item.farms %}
+    <tr>
+      <td><a href="{{ url_for('farm_detail', farm_id=farm.id) }}">{{ farm.name }}</a></td>
+      <td>{{ farm.county or '—' }}</td>
+      <td>{{ farm.state or '—' }}</td>
+      <td>{{ (farm.categories or []) | join(', ') }}</td>
+      <td class="{% if farm.is_organic_certified %}cell-green{% endif %}">
+        {{ '✓' if farm.is_organic_certified else '' }}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty-msg">No farms scraped yet for this certification.</p>
+  {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

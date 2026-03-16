@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Admin</h1>
+
+<div class="admin-grid">
+
+  <div class="admin-card">
+    <h2>Run Scrapers</h2>
+    <p>Fetch latest certified entities from all certification registries.</p>
+    <form method="POST" action="{{ url_for('run_scrape') }}">
+      <select name="scraper" class="form-select">
+        <option value="all">All Scrapers</option>
+        <option value="ROC">ROC</option>
+        <option value="Regenefied">Regenefied</option>
+        <option value="Regenagri">Regenagri</option>
+        <option value="Savory Land to Market">Savory Land to Market</option>
+        <option value="Demeter">Demeter</option>
+        <option value="Real Organic Project">Real Organic Project</option>
+        <option value="A Greener World Certified Regenerative">A Greener World</option>
+        <option value="Certified Naturally Grown">Certified Naturally Grown</option>
+      </select>
+      <button type="submit" class="btn btn-green">Run Scraper</button>
+    </form>
+  </div>
+
+  <div class="admin-card">
+    <h2>Check Standards</h2>
+    <p>Fetch and compare all certification standards pages. Records any changes detected.</p>
+    <form method="POST" action="{{ url_for('check_standards') }}">
+      <button type="submit" class="btn btn-blue">Check Standards Now</button>
+    </form>
+  </div>
+
+  <div class="admin-card">
+    <h2>Run Sales Targeting</h2>
+    <p>Rebuild the sales target list from current brand, farm, and certification data.</p>
+    <form method="POST" action="{{ url_for('run_targeting_route') }}">
+      <button type="submit" class="btn btn-amber">Run Targeting</button>
+    </form>
+  </div>
+
+  <div class="admin-card">
+    <h2>Send Weekly Report</h2>
+    <p>Generate PDF and email to paul.lightfoot@gmail.com right now.</p>
+    <form method="POST" action="{{ url_for('send_report_now') }}">
+      <button type="submit" class="btn btn-green">Generate & Send Report</button>
+    </form>
+  </div>
+
+</div>
+
+<div class="section">
+  <h2 class="section-title">Certifications</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Name</th><th>Short Name</th><th>ROC?</th><th>Registry URL</th><th>Standards URL</th></tr>
+    </thead>
+    <tbody>
+    {% for cert in certs %}
+    <tr>
+      <td>{{ cert.name }}</td>
+      <td>{{ cert.short_name }}</td>
+      <td class="{% if cert.is_roc %}cell-green{% endif %}">{{ '✓ ROC' if cert.is_roc else '' }}</td>
+      <td>{% if cert.registry_url %}<a href="{{ cert.registry_url }}" target="_blank">↗</a>{% endif %}</td>
+      <td>{% if cert.standards_url %}<a href="{{ cert.standards_url }}" target="_blank">↗</a>{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <a href="{{ url_for('add_cert') }}" class="btn btn-sm btn-muted" style="margin-top:8px">+ Add Certification</a>
+</div>
+
+<div class="section">
+  <h2 class="section-title">Recent Scrape Logs</h2>
+  {% if logs %}
+  <table class="data-table">
+    <thead><tr><th>Scraper</th><th>Run Date</th><th>Status</th><th>Found</th><th>New</th><th>Updated</th><th>Error</th></tr></thead>
+    <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log.scraper_name }}</td>
+      <td>{{ log.run_date.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td class="status-{{ log.status }}">{{ log.status }}</td>
+      <td>{{ log.items_found }}</td>
+      <td>{{ log.items_new }}</td>
+      <td>{{ log.items_updated }}</td>
+      <td class="error-cell">{{ log.error_message or '' }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty-msg">No logs yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

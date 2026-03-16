@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+
+<p class="intro-text">
+  Comparison of regenerative certification standards. ROA's key interest:
+  which certifications <strong>prohibit synthetic fertilizers</strong> and
+  <strong>petrochemical-based pesticides/herbicides</strong>.
+</p>
+
+<div class="section">
+  <h2 class="section-title">Standards Comparison Table</h2>
+  <div class="table-scroll">
+  <table class="data-table comparison-table">
+    <thead>
+      <tr>
+        <th>Certification</th>
+        <th title="Prohibits synthetic/chemical fertilizers">🚫 Synth Fertilizer</th>
+        <th title="Prohibits petrochemical pesticides and herbicides">🚫 Synth Pesticide</th>
+        <th>🚫 GMOs</th>
+        <th>Soil Testing</th>
+        <th>Livestock</th>
+        <th>3rd Party Verified</th>
+        <th>Organic Base</th>
+        <th>Social Fairness</th>
+        <th>History</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for cert in certs %}
+    {% set attrs = attrs_map.get(cert.id) %}
+    <tr class="{% if cert.is_roc %}row-roc{% endif %}">
+      <td class="cert-name">
+        {{ cert.name }}
+        {% if cert.is_roc %}<span class="badge badge-green">ROC</span>{% endif %}
+      </td>
+      {% if attrs %}
+        <td class="{{ 'cell-green' if attrs.prohibits_synthetic_fertilizers == True else ('cell-red' if attrs.prohibits_synthetic_fertilizers == False else '') }}">
+          {{ '✓ YES' if attrs.prohibits_synthetic_fertilizers == True else ('✗ NO' if attrs.prohibits_synthetic_fertilizers == False else '?') }}
+        </td>
+        <td class="{{ 'cell-green' if attrs.prohibits_synthetic_pesticides == True else ('cell-red' if attrs.prohibits_synthetic_pesticides == False else '') }}">
+          {{ '✓ YES' if attrs.prohibits_synthetic_pesticides == True else ('✗ NO' if attrs.prohibits_synthetic_pesticides == False else '?') }}
+        </td>
+        <td class="{{ 'cell-green' if attrs.prohibits_gmos == True else '' }}">
+          {{ '✓' if attrs.prohibits_gmos == True else ('✗' if attrs.prohibits_gmos == False else '?') }}
+        </td>
+        <td>{{ '✓' if attrs.requires_soil_testing else '' }}</td>
+        <td>{{ '✓' if attrs.covers_livestock else '' }}</td>
+        <td>{{ '✓' if attrs.third_party_verified else '✗ Peer' }}</td>
+        <td class="{{ 'cell-green' if attrs.requires_organic_base else '' }}">
+          {{ '✓' if attrs.requires_organic_base else '—' }}
+        </td>
+        <td>{{ '✓' if attrs.has_social_fairness else '—' }}</td>
+      {% else %}
+        {% for _ in range(8) %}<td>—</td>{% endfor %}
+      {% endif %}
+      <td><a href="{{ url_for('standards_history', cert_id=cert.id) }}">History</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2 class="section-title">Standards Notes</h2>
+  {% for cert in certs %}
+    {% set attrs = attrs_map.get(cert.id) %}
+    {% if attrs and attrs.notes %}
+    <div class="cert-notes">
+      <strong>{{ cert.name }}</strong>
+      <p>{{ attrs.notes }}</p>
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{% if recent_changes %}
+<div class="section">
+  <h2 class="section-title">Recent Standards Changes</h2>
+  <table class="data-table">
+    <thead>
+      <tr><th>Certification</th><th>Date</th><th>Synth Fert Changed?</th><th>Synth Pest Changed?</th><th>Source</th></tr>
+    </thead>
+    <tbody>
+    {% for chg in recent_changes %}
+    <tr>
+      <td>{{ chg.certification.name if chg.certification else '—' }}</td>
+      <td>{{ chg.change_date.strftime('%Y-%m-%d') }}</td>
+      <td class="{% if chg.synthetic_fertilizer_changed %}cell-red{% endif %}">
+        {{ '⚠ YES' if chg.synthetic_fertilizer_changed else 'No' }}
+      </td>
+      <td class="{% if chg.synthetic_pesticide_changed %}cell-red{% endif %}">
+        {{ '⚠ YES' if chg.synthetic_pesticide_changed else 'No' }}
+      </td>
+      <td>{% if chg.new_snapshot and chg.new_snapshot.source_url %}
+        <a href="{{ chg.new_snapshot.source_url }}" target="_blank">↗</a>
+      {% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

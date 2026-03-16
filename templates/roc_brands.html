@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ title }}</h1>
+<p class="count-label">{{ brands|length }} certified brand(s)</p>
+
+{% if brands %}
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>Brand Name</th>
+      <th>Categories</th>
+      <th>Organic Certified?</th>
+      <th>Country</th>
+      <th>Website</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for brand in brands %}
+    <tr>
+      <td><a href="{{ url_for('brand_detail', brand_id=brand.id) }}">{{ brand.name }}</a></td>
+      <td>{{ (brand.categories or []) | join(', ') }}</td>
+      <td class="{% if brand.is_organic_certified %}cell-green{% endif %}">
+        {{ '✓ Yes' if brand.is_organic_certified else 'No' }}
+      </td>
+      <td>{{ brand.country or 'USA' }}</td>
+      <td>{% if brand.website %}<a href="{{ brand.website }}" target="_blank">↗</a>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty-msg">No ROC certified brands in the database yet. Run a scrape from <a href="{{ url_for('admin') }}">Admin</a>.</p>
+{% endif %}
+{% endblock %}
