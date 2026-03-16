@@ -1,0 +1,72 @@
+# Mill Valley Tracker — Weekly Report Workflow
+#
+# SETUP REQUIRED: Add these secrets in your GitHub repo before this will work:
+#   GitHub repo → Settings → Secrets and variables → Actions → New repository secret
+#
+#   ANTHROPIC_API_KEY   : Your Anthropic API key (sk-ant-api03-...)
+#   GMAIL_APP_PASSWORD  : Your Gmail app password (16-char code, no spaces)
+#
+# The workflow runs every Friday at 8pm UTC (noon Pacific Standard Time).
+# You can also trigger it manually from the Actions tab.
+
+name: Mill Valley Weekly Report
+
+on:
+  # Run every Friday at 20:00 UTC (noon PT / 1pm PDT)
+  schedule:
+    - cron: "0 20 * * 5"
+
+  # Allow manual trigger from the GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: "Days to look back (default 7, use 365 for initial historical run)"
+        required: false
+        default: "7"
+      dry_run:
+        description: "Dry run (save HTML but do NOT send email)"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  generate-and-send-report:
+    name: Generate and Send Weekly Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Mill Valley Tracker
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SENDER_EMAIL: "paul.lightfoot@gmail.com"
+          RECIPIENT_EMAIL: "paul.lightfoot@gmail.com"
+          # Use manual input if provided, otherwise default to 7 days
+          LOOKBACK_DAYS: ${{ github.event.inputs.lookback_days || '7' }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python main.py --save-html --output report_latest.html
+          else
+            python main.py --save-html --output report_latest.html
+          fi
+
+      - name: Upload report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-report-${{ github.run_number }}
+          path: report_latest.html
+          retention-days: 90
