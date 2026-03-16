@@ -18,6 +18,11 @@ on:
 
   # Allow manual trigger from the GitHub Actions UI
   workflow_dispatch:
+
+  # Push trigger to ensure GitHub indexes this workflow
+  push:
+    branches:
+      - claude/mill-valley-tracker-tDsHQ
     inputs:
       lookback_days:
         description: "Days to look back (default 7, use 365 for initial historical run)"
