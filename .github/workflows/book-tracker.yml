@@ -1,0 +1,103 @@
+# Book Research Tracker — Weekly Workflow
+#
+# SETUP REQUIRED: Add these secrets in GitHub repo Settings → Secrets → Actions:
+#
+#   ANTHROPIC_API_KEY    : Your Anthropic API key (sk-ant-api03-...)
+#   GMAIL_APP_PASSWORD   : Your Gmail app password (16-char code, no spaces)
+#   INDEX_PASSWORD       : Password to protect the HTML research index
+#
+# Optional secrets (enable more sources):
+#   LISTENNOTES_API_KEY  : Listen Notes API key (free tier: listennotes.com)
+#   BRAVE_SEARCH_API_KEY : Brave Search API key (free tier: api.search.brave.com)
+#
+# Runs every Friday at 8pm UTC (noon Pacific) — same schedule as Mill Valley tracker.
+# Commits the updated research index back to the repo after each run.
+
+name: Book Research Tracker
+
+on:
+  schedule:
+    - cron: "0 20 * * 5"   # Every Friday at 20:00 UTC
+
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: "Days to look back (default 7; use 365 for initial run)"
+        required: false
+        default: "7"
+      dry_run:
+        description: "Dry run — analyze and save HTML but do NOT send email"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  research-tracker:
+    name: Run Weekly Book Research Tracker
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: write   # needed to commit updated index back to repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: book-tracker/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r book-tracker/requirements.txt
+
+      - name: Run Book Research Tracker
+        working-directory: book-tracker
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SENDER_EMAIL: "paul.lightfoot@gmail.com"
+          RECIPIENT_EMAIL: "paul.lightfoot@gmail.com"
+          INDEX_PASSWORD: ${{ secrets.INDEX_PASSWORD }}
+          LISTENNOTES_API_KEY: ${{ secrets.LISTENNOTES_API_KEY }}
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+          LOOKBACK_DAYS: ${{ github.event.inputs.lookback_days || '7' }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python main.py --dry-run --output ../digest_latest.html
+          else
+            python main.py --output ../digest_latest.html
+          fi
+
+      - name: Commit updated research index
+        run: |
+          git config user.name "Book Research Tracker"
+          git config user.email "actions@github.com"
+          git add book-tracker/index/master_index.json book-tracker/index/index.html || true
+          if git diff --staged --quiet; then
+            echo "No index changes to commit."
+          else
+            git commit -m "Update research index — $(date '+%Y-%m-%d')"
+            git push origin ${{ github.ref_name }}
+          fi
+
+      - name: Upload email digest as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book-research-digest-${{ github.run_number }}
+          path: digest_latest.html
+          retention-days: 90
+
+      - name: Upload research index as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-index-${{ github.run_number }}
+          path: book-tracker/index/index.html
+          retention-days: 365
