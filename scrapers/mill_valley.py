@@ -2,6 +2,8 @@
 Scrape Mill Valley city government sources:
 - City Council agendas and minutes (cityofmillvalley.org)
 - Planning Commission agendas and minutes
+- Housing Advisory Committee (HAC) agendas and minutes
+- Mill Valley Affordable Housing Committee (MVAHC)
 - City news/press releases
 - Marin Transit and SMART train updates
 """
@@ -27,6 +29,9 @@ HOUSING_KEYWORDS = [
     "adu", "accessory", "affordable", "residential", "development", "permit",
     "general plan", "housing element", "sb 9", "sb9", "yimby", "infill",
     "mixed use", "mixed-use", "variance", "conditional use",
+    "housing advisory", "hac", "affordable housing committee", "mvahc",
+    "mccauley", "urban carmel", "yolles", "hildebrand", "matthew franklin",
+    "patrick kelly", "danielle staude",
 ]
 
 TRANSIT_KEYWORDS = [
@@ -43,6 +48,8 @@ def scrape_mill_valley(since: datetime) -> list[dict]:
     """Scrape all Mill Valley government sources. Returns list of items."""
     items = []
     items.extend(_scrape_agenda_center(since))
+    items.extend(_scrape_hac(since))
+    items.extend(_scrape_affordable_housing_committee(since))
     items.extend(_scrape_city_news(since))
     items.extend(_scrape_marin_transit(since))
     items.extend(_scrape_smart_train(since))
@@ -163,6 +170,173 @@ def _scrape_agenda_center(since: datetime) -> list[dict]:
             filtered.append(item)
 
     return filtered
+
+
+def _scrape_hac(since: datetime) -> list[dict]:
+    """
+    Scrape Housing Advisory Committee (HAC) agendas, minutes, and meeting pages.
+    Members: John McCauley (Chair/Council Liaison), Urban Carmel (Council Liaison),
+    Jon Yolles (Planning Commission rep), Greg Hildebrand (Planning Commission Liaison),
+    Matthew Franklin (Member at Large).
+    Key staff: Patrick Kelly (Director of Planning & Building), Danielle Staude (Planner).
+    """
+    items = []
+    urls_to_try = [
+        "https://www.cityofmillvalley.org/government/boards-commissions/housing-advisory-committee",
+        "https://www.cityofmillvalley.org/AgendaCenter/Housing-Advisory-Committee",
+        "https://www.cityofmillvalley.org/HAC",
+        "https://www.cityofmillvalley.org/government/housing-advisory-committee",
+        "https://www.cityofmillvalley.org/AgendaCenter",
+    ]
+
+    found_urls = set()
+    for base_url in urls_to_try:
+        resp = _get(base_url)
+        if not resp:
+            time.sleep(1)
+            continue
+
+        soup = BeautifulSoup(resp.content, "lxml")
+        page_text = soup.get_text(" ", strip=True).lower()
+
+        # Only dig into this page if it has HAC-related content
+        hac_signals = ["housing advisory", "hac", "mccauley", "yolles", "hildebrand", "matthew franklin", "danielle staude"]
+        if not any(sig in page_text for sig in hac_signals) and "agendacenter" not in base_url.lower():
+            time.sleep(1)
+            continue
+
+        # Collect links to agendas/minutes
+        for link in soup.find_all("a", href=True):
+            href = link["href"]
+            text = link.get_text(strip=True)
+            if not text or len(text) < 5:
+                continue
+            combined = (text + " " + href).lower()
+            if not any(kw in combined for kw in ["agenda", "minutes", "packet", "meeting", "housing advisory", "hac"]):
+                continue
+            full_url = href if href.startswith("http") else f"https://www.cityofmillvalley.org{href}"
+            if full_url in found_urls:
+                continue
+            found_urls.add(full_url)
+            date = _extract_date(text) or _extract_date(href)
+            if date and date < since:
+                continue
+            items.append({
+                "source": "Mill Valley Housing Advisory Committee (HAC)",
+                "title": text,
+                "url": full_url,
+                "date": date,
+                "type": "government_meeting",
+                "content": text,
+                "relevant": True,
+            })
+
+        # Grab inline text blocks mentioning HAC
+        for elem in soup.find_all(["h2", "h3", "h4", "p", "li", "div"]):
+            text = elem.get_text(separator=" ", strip=True)
+            if len(text) < 20 or len(text) > 800:
+                continue
+            t = text.lower()
+            if not any(sig in t for sig in hac_signals) and not _is_relevant(text):
+                continue
+            date = _extract_date(text)
+            if date and date < since:
+                continue
+            items.append({
+                "source": "Mill Valley Housing Advisory Committee (HAC)",
+                "title": text[:120],
+                "url": base_url,
+                "date": date,
+                "type": "government_notice",
+                "content": text[:600],
+                "relevant": True,
+            })
+
+        time.sleep(1)
+        if items:
+            break
+
+    return items
+
+
+def _scrape_affordable_housing_committee(since: datetime) -> list[dict]:
+    """
+    Scrape Mill Valley Affordable Housing Committee (MVAHC) content.
+    This is a community/advocacy body focused on affordable housing in Mill Valley.
+    """
+    items = []
+    urls_to_try = [
+        "https://www.cityofmillvalley.org/government/boards-commissions/affordable-housing-committee",
+        "https://www.cityofmillvalley.org/affordable-housing-committee",
+        "https://www.cityofmillvalley.org/government/affordable-housing",
+        "https://www.cityofmillvalley.org/AgendaCenter",
+    ]
+
+    ahc_signals = ["affordable housing committee", "mvahc", "affordable housing"]
+    found_urls = set()
+
+    for base_url in urls_to_try:
+        resp = _get(base_url)
+        if not resp:
+            time.sleep(1)
+            continue
+
+        soup = BeautifulSoup(resp.content, "lxml")
+        page_text = soup.get_text(" ", strip=True).lower()
+
+        if not any(sig in page_text for sig in ahc_signals) and "agendacenter" not in base_url.lower():
+            time.sleep(1)
+            continue
+
+        for link in soup.find_all("a", href=True):
+            href = link["href"]
+            text = link.get_text(strip=True)
+            if not text or len(text) < 5:
+                continue
+            combined = (text + " " + href).lower()
+            if not any(kw in combined for kw in ["agenda", "minutes", "packet", "meeting", "affordable housing"]):
+                continue
+            full_url = href if href.startswith("http") else f"https://www.cityofmillvalley.org{href}"
+            if full_url in found_urls:
+                continue
+            found_urls.add(full_url)
+            date = _extract_date(text) or _extract_date(href)
+            if date and date < since:
+                continue
+            items.append({
+                "source": "Mill Valley Affordable Housing Committee",
+                "title": text,
+                "url": full_url,
+                "date": date,
+                "type": "government_meeting",
+                "content": text,
+                "relevant": True,
+            })
+
+        for elem in soup.find_all(["h2", "h3", "h4", "p", "li"]):
+            text = elem.get_text(separator=" ", strip=True)
+            if len(text) < 20 or len(text) > 800:
+                continue
+            if not any(sig in text.lower() for sig in ahc_signals):
+                continue
+            date = _extract_date(text)
+            if date and date < since:
+                continue
+            items.append({
+                "source": "Mill Valley Affordable Housing Committee",
+                "title": text[:120],
+                "url": base_url,
+                "date": date,
+                "type": "government_notice",
+                "content": text[:600],
+                "relevant": True,
+            })
+
+        time.sleep(1)
+        if items:
+            break
+
+    return items
 
 
 def _scrape_city_news(since: datetime) -> list[dict]:

@@ -66,6 +66,21 @@ def analyze_content(
 - Global models of successful housing density and transit reform
 - YIMBY movement, Strong Towns philosophy, and evidence-based urbanism
 
+Key Mill Valley housing bodies you track closely:
+
+**Housing Advisory Committee (HAC)**
+- John McCauley — Committee Chair and City Council Liaison
+- Urban Carmel — City Council Liaison
+- Jon Yolles — Planning Commission representative
+- Greg Hildebrand — Planning Commission Liaison
+- Matthew Franklin — Member at Large
+- Key city staff: Patrick Kelly (Director of Planning and Building) and
+  Danielle Staude (Planner who presents HAC items to Council)
+
+**Mill Valley Affordable Housing Committee (MVAHC)**
+- Community advisory body focused specifically on affordable housing policy and
+  advocacy within Mill Valley
+
 You write for an engaged, informed audience who cares deeply about Mill Valley's future.
 Your writing is analytical, specific, editorial, and occasionally opinionated.
 You cite specific details, dates, and places. You connect local news to bigger patterns.
@@ -74,7 +89,8 @@ You are optimistic but clear-eyed about obstacles."""
     user_prompt = f"""Please write a comprehensive weekly tracker report covering the period {period_start} to {period_end}.
 
 === MILL VALLEY & MARIN COUNTY CONTENT ===
-(City Council meetings, Planning Commission, local news, transit updates)
+(City Council meetings, Planning Commission, Housing Advisory Committee (HAC),
+Mill Valley Affordable Housing Committee (MVAHC), local news, transit updates)
 
 {mv_formatted}
 
@@ -91,8 +107,20 @@ Write the report in two clearly separated sections:
 
 Write a narrative briefing on what's happening in Mill Valley and Marin County on:
 
-**Housing Density**
-- What proposals, decisions, or discussions happened this week?
+**Housing Advisory Committee (HAC)**
+- Any meetings, agenda items, votes, or notable discussions this week?
+- What housing projects or policy questions are before the HAC?
+- Any actions by members John McCauley, Urban Carmel, Jon Yolles, Greg Hildebrand, or Matthew Franklin worth noting?
+- Any items flagged by staff Patrick Kelly or Danielle Staude for Council?
+- What should we watch for at the next HAC meeting?
+
+**Mill Valley Affordable Housing Committee (MVAHC)**
+- Any meetings, recommendations, or advocacy activity this week?
+- What affordable housing projects or policy proposals are they engaged with?
+- Any positions or communications directed to City Council or staff?
+
+**Housing Density (General)**
+- What proposals, decisions, or discussions happened this week beyond the committees?
 - What stage is the city's Housing Element compliance?
 - Any notable development projects, ADU activity, or zoning changes?
 - What should we watch for next?
