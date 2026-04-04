@@ -16,27 +16,84 @@ from urllib.error import URLError
 # ---------------------------------------------------------------------------
 
 RSS_FEEDS: list[dict] = [
-    # Example structure:
-    # {
-    #     "name": "Journal of Rural Studies",
-    #     "url": "https://rss.sciencedirect.com/publication/science/07430167",
-    # },
-    # {
-    #     "name": "Land Use Policy (journal)",
-    #     "url": "https://rss.sciencedirect.com/publication/science/02648377",
-    # },
-    # {
-    #     "name": "American Farmland Trust Blog",
-    #     "url": "https://farmland.org/feed/",
-    # },
+    # --- Academic journals (ScienceDirect RSS) ---
+    {
+        "name": "Land Use Policy (journal)",
+        "url": "https://rss.sciencedirect.com/publication/science/02648377",
+    },
+    {
+        "name": "Food Policy (journal)",
+        "url": "https://rss.sciencedirect.com/publication/science/03069192",
+    },
+    {
+        "name": "Journal of Rural Studies",
+        "url": "https://rss.sciencedirect.com/publication/science/07430167",
+    },
+    {
+        "name": "Agriculture, Ecosystems & Environment",
+        "url": "https://rss.sciencedirect.com/publication/science/01678809",
+    },
+    # --- Think tanks & research institutions ---
+    {
+        "name": "Rodale Institute Blog",
+        "url": "https://rodaleinstitute.org/feed/",
+    },
+    {
+        "name": "Organic Trade Association News",
+        "url": "https://ota.com/feed",
+    },
+    {
+        "name": "Rockefeller Foundation: Food & Agriculture",
+        "url": "https://www.rockefellerfoundation.org/feed/",
+    },
+    {
+        "name": "Union of Concerned Scientists: Food & Agriculture",
+        "url": "https://www.ucsusa.org/rss/news.xml",
+    },
+    {
+        "name": "GRAIN (international farmland/food sovereignty)",
+        "url": "https://grain.org/e/feed",
+    },
+    # --- Medical / UPF journals ---
+    {
+        "name": "The Lancet (RSS — flag UPF, food, nutrition hits)",
+        "url": "https://www.thelancet.com/rssFeed/lancet_online.xml",
+    },
+    {
+        "name": "BMJ: Food & Nutrition",
+        "url": "https://www.bmj.com/rss/thebmj.xml",
+    },
+    # --- Pesticides & chemicals ---
+    {
+        "name": "Environmental Health News",
+        "url": "https://www.ehn.org/feed/",
+    },
+    {
+        "name": "Environmental Health Perspectives",
+        "url": "https://ehp.niehs.nih.gov/action/showFeed?type=etoc&feed=rss&jc=ehp",
+    },
+    # --- International / policy ---
+    {
+        "name": "IPES-Food (International Panel of Experts on Sustainable Food Systems)",
+        "url": "https://www.ipes-food.org/feed/",
+    },
+    {
+        "name": "IATP (Institute for Agriculture and Trade Policy)",
+        "url": "https://www.iatp.org/feed",
+    },
 ]
 
 SOURCE_URLS: list[dict] = [
-    # Example structure:
-    # {
-    #     "name": "USDA National Agricultural Library",
-    #     "url": "https://www.nal.usda.gov/",
-    # },
+    # Rodale Institute Farming Systems Trial — check for new data releases
+    {
+        "name": "Rodale Institute: Farming Systems Trial",
+        "url": "https://rodaleinstitute.org/science/farming-systems-trial/",
+    },
+    # EWG Dirty Dozen / pesticide reports
+    {
+        "name": "EWG: Pesticides in Produce",
+        "url": "https://www.ewg.org/foodnews/",
+    },
 ]
 
 

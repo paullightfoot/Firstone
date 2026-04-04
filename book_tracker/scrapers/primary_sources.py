@@ -17,20 +17,58 @@ from html.parser import HTMLParser
 # ---------------------------------------------------------------------------
 
 SOURCE_URLS: list[dict] = [
-    # Example structure:
-    # {
-    #     "name": "USDA ERS - Farmland",
-    #     "url": "https://www.ers.usda.gov/topics/farm-economy/land-use-land-value-tenure/",
-    #     "type": "rss_or_html",
-    # },
+    # USDA ERS topic pages — scraped for recent data releases
+    {
+        "name": "USDA ERS: Land Use, Land Value & Tenure",
+        "url": "https://www.ers.usda.gov/topics/farm-economy/land-use-land-value-tenure/",
+    },
+    {
+        "name": "USDA ERS: Farm Income & Finance",
+        "url": "https://www.ers.usda.gov/topics/farm-economy/farm-income-and-wealth-statistics/",
+    },
+    {
+        "name": "USDA ERS: Organic Agriculture",
+        "url": "https://www.ers.usda.gov/topics/natural-resources-environment/organic-agriculture/",
+    },
+    {
+        "name": "USDA ERS: Bioenergy (Ethanol)",
+        "url": "https://www.ers.usda.gov/topics/farm-economy/bioenergy/",
+    },
+    {
+        "name": "EPA Renewable Fuel Standard Program",
+        "url": "https://www.epa.gov/renewable-fuel-standard-program",
+    },
+    {
+        "name": "EWG Farm Subsidy Database",
+        "url": "https://farm.ewg.org/",
+    },
 ]
 
 RSS_FEEDS: list[dict] = [
-    # Example structure:
-    # {
-    #     "name": "USDA News",
-    #     "url": "https://www.usda.gov/rss/home.xml",
-    # },
+    {
+        "name": "USDA Agricultural News",
+        "url": "https://www.usda.gov/rss/home.xml",
+    },
+    {
+        "name": "USDA ERS: All Reports & Data Products",
+        "url": "https://www.ers.usda.gov/rss/allreports.xml",
+    },
+    {
+        "name": "USDA NASS: News Releases",
+        "url": "https://www.nass.usda.gov/rss/nassprnews.xml",
+    },
+    {
+        "name": "EPA: Fuels & Fuel Additives (RFS)",
+        "url": "https://www.epa.gov/rss/epa-news.rss",  # broad EPA feed; filter by topic
+    },
+    {
+        "name": "American Farmland Trust News",
+        "url": "https://farmlandinfo.org/feed/",
+    },
+    {
+        "name": "EWG News",
+        "url": "https://www.ewg.org/feed/",
+    },
 ]
 
 

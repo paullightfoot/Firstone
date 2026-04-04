@@ -16,19 +16,59 @@ from urllib.error import URLError
 # ---------------------------------------------------------------------------
 
 RSS_FEEDS: list[dict] = [
-    # Example structure:
-    # {
-    #     "name": "The Land Report",
-    #     "url": "https://landreport.com/feed/",
-    # },
-    # {
-    #     "name": "Civil Eats",
-    #     "url": "https://civileats.com/feed/",
-    # },
-    # {
-    #     "name": "High Country News",
-    #     "url": "https://www.hcn.org/rss.xml",
-    # },
+    # --- Food system / investigative ---
+    {
+        "name": "Civil Eats",
+        "url": "https://civileats.com/feed/",
+    },
+    {
+        "name": "Food Politics (Marion Nestle)",
+        "url": "https://www.foodpolitics.com/feed/",
+    },
+    {
+        "name": "Modern Farmer",
+        "url": "https://modernfarmer.com/feed/",
+    },
+    {
+        "name": "The Counter",
+        "url": "https://thecounter.org/feed/",
+    },
+    {
+        "name": "The Land Report",
+        "url": "https://landreport.com/feed/",
+    },
+    # --- Agriculture trade press ---
+    {
+        "name": "Agri-Pulse",
+        "url": "https://www.agri-pulse.com/rss/news",
+    },
+    {
+        "name": "DTN Progressive Farmer",
+        "url": "https://www.dtnpf.com/agriculture/web/ag/news/rss",
+    },
+    # --- Health & UPF ---
+    {
+        "name": "STAT News: Food & Nutrition",
+        "url": "https://www.statnews.com/feed/",
+    },
+    # --- Environment / climate ---
+    {
+        "name": "High Country News",
+        "url": "https://www.hcn.org/rss.xml",
+    },
+    {
+        "name": "Inside Climate News",
+        "url": "https://insideclimatenews.org/feed/",
+    },
+    # --- National outlets (food/farm beats) ---
+    {
+        "name": "Politico Agriculture",
+        "url": "https://rss.politico.com/agriculture.xml",
+    },
+    {
+        "name": "The Guardian: Food",
+        "url": "https://www.theguardian.com/environment/food/rss",
+    },
 ]
 
 

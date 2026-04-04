@@ -15,14 +15,13 @@ from email.mime.text import MIMEText
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "paul.lightfoot@gmail.com")
 RECIPIENT_EMAIL = os.environ.get("RECIPIENT_EMAIL", "paul.lightfoot@gmail.com")
 
-# TODO: Update once book title/topics are confirmed
-BOOK_TITLE = "Book Research Tracker"
-BOOK_SUBTITLE = "Weekly Research Digest"  # e.g. "Farmland, Land Use & Rural America"
+BOOK_TITLE = "Food System Tracker"
+BOOK_SUBTITLE = "Farmland · Subsidies · Organic · Health · Policy"
 
-# Color theme — earthy/agrarian palette (adjust as desired)
-COLOR_PRIMARY = "#3d2b1f"    # dark brown
-COLOR_SECONDARY = "#5a7a3a"  # forest green
-COLOR_ACCENT = "#8b6914"     # amber/wheat
+# Earthy/agrarian palette
+COLOR_PRIMARY = "#3d2b1f"    # dark soil brown
+COLOR_SECONDARY = "#5a7a3a"  # field green
+COLOR_ACCENT = "#8b6914"     # wheat/amber
 
 
 def _markdown_to_html(text: str) -> str:
@@ -235,7 +234,7 @@ def render_report(report: dict, since: datetime) -> str:
                 This report was generated automatically by the Book Research Tracker.
               </p>
               <p style="font-size: 12px; color: #7f8c8d; margin: 0 0 8px 0;">
-                Sources: Government agencies, news outlets, academic journals, and research institutions.
+                Sources: USDA/ERS, EPA/RFS, EWG, Civil Eats, Food Politics, Modern Farmer, The Counter, Rodale Institute, Lancet, BMJ, Land Use Policy, and more.
               </p>
               <p style="font-size: 11px; color: #95a5a6; margin: 0;">
                 Analysis powered by Claude (Anthropic) · Delivered weekly
