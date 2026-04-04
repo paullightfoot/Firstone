@@ -180,23 +180,28 @@ def create_app():
 
     @app.route("/admin/scrape", methods=["POST"])
     def run_scrape():
+        import threading
         scraper_name = request.form.get("scraper", "all")
-        flash(f"Scrape job '{scraper_name}' queued — check logs.", "success")
-        # Import here to avoid circular import at module load time
+        flash(f"Scrape job '{scraper_name}' started in background — refresh logs in a minute.", "success")
         from run_scrapers import run_one_scraper, run_all_scrapers
         if scraper_name == "all":
-            run_all_scrapers(app.app_context())
+            t = threading.Thread(target=run_all_scrapers, args=(app.app_context(),), daemon=True)
         else:
-            run_one_scraper(scraper_name, app.app_context())
+            t = threading.Thread(target=run_one_scraper, args=(scraper_name, app.app_context()), daemon=True)
+        t.start()
         return redirect(url_for("admin"))
 
     @app.route("/admin/check-standards", methods=["POST"])
     def check_standards():
+        import threading
         from scrapers.standards import StandardsMonitor, seed_standards_attributes
         seed_standards_attributes(app.app_context())
         monitor = StandardsMonitor()
-        changes = monitor.monitor_all(app.app_context())
-        flash(f"Standards check complete. {len(changes)} change(s) detected.", "success")
+        flash("Standards check started in background — refresh in a minute.", "success")
+        t = threading.Thread(target=monitor.monitor_all, args=(app.app_context(),), daemon=True)
+        t.start()
+        changes = []
+        flash(f"Standards check running in background.", "success")
         return redirect(url_for("standards"))
 
     @app.route("/admin/run-targeting", methods=["POST"])
@@ -209,15 +214,16 @@ def create_app():
 
     @app.route("/admin/send-report", methods=["POST"])
     def send_report_now():
-        with app.app_context():
-            from reports.pdf_generator import generate_report
-            from reports.email_sender import send_weekly_report
-            pdf_path = generate_report(since=datetime.utcnow() - timedelta(days=7))
-            success = send_weekly_report(pdf_path)
-            if success:
-                flash("Weekly report generated and sent successfully.", "success")
-            else:
-                flash("Report generated but email failed — check logs.", "warning")
+        import threading
+        def _send():
+            with app.app_context():
+                from reports.pdf_generator import generate_report
+                from reports.email_sender import send_weekly_report
+                pdf_path = generate_report(since=datetime.utcnow() - timedelta(days=7))
+                send_weekly_report(pdf_path)
+        t = threading.Thread(target=_send, daemon=True)
+        t.start()
+        flash("Report is generating and will be emailed to paul.lightfoot@gmail.com shortly.", "success")
         return redirect(url_for("admin"))
 
     @app.route("/admin/cert/add", methods=["GET", "POST"])
