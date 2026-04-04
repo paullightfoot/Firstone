@@ -1,0 +1,69 @@
+# Book Research Tracker — Weekly Report Workflow
+#
+# Uses the same GitHub secrets as the Mill Valley tracker:
+#   ANTHROPIC_API_KEY   : Your Anthropic API key (already set)
+#   GMAIL_APP_PASSWORD  : Your Gmail app password (already set)
+#
+# Runs every Saturday at 16:00 UTC (9am PT / noon ET).
+# You can also trigger it manually from the Actions tab.
+
+name: Book Research Weekly Report
+
+on:
+  # Run every Saturday at 16:00 UTC (9am PT)
+  schedule:
+    - cron: "0 16 * * 6"
+
+  # Allow manual trigger from the GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: "Days to look back (default 7, use 365 for initial historical run)"
+        required: false
+        default: "7"
+      dry_run:
+        description: "Dry run (save HTML but do NOT send email)"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  generate-and-send-report:
+    name: Generate and Send Book Research Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Book Research Tracker
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SENDER_EMAIL: "paul.lightfoot@gmail.com"
+          RECIPIENT_EMAIL: "paul.lightfoot@gmail.com"
+          LOOKBACK_DAYS: ${{ github.event.inputs.lookback_days || '7' }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python book_tracker/main.py --dry-run --output book_report_latest.html
+          else
+            python book_tracker/main.py --save-html --output book_report_latest.html
+          fi
+
+      - name: Upload report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: book-report-${{ github.run_number }}
+          path: book_report_latest.html
+          retention-days: 90
