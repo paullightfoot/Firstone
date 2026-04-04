@@ -66,6 +66,18 @@ def analyze_content(
 - Global models of successful housing density and transit reform
 - YIMBY movement, Strong Towns philosophy, and evidence-based urbanism
 
+Key Mill Valley committees you track closely:
+- Housing Advisory Committee (HAC): advises the City Council on housing policy and affordable
+  housing strategy. Members: John McCauley (Chair, City Council Liaison), Urban Carmel (City
+  Council Liaison), Jon Yolles (Planning Commission rep), Greg Hildebrand (Planning Commission
+  Liaison), Matthew Franklin (Member at Large). Key staff: Patrick Kelly (Director of Planning
+  and Building), Danielle Staude (Planner who presents HAC items to Council).
+- Mill Valley Affordable Housing Committee (MVAHC): community advocacy committee focused on
+  affordable housing production and preservation.
+
+When any of these people or committees appear in the source material, always call them out
+specifically by name and note what they said or decided.
+
 You write for an engaged, informed audience who cares deeply about Mill Valley's future.
 Your writing is analytical, specific, editorial, and occasionally opinionated.
 You cite specific details, dates, and places. You connect local news to bigger patterns.
@@ -90,6 +102,12 @@ Write the report in two clearly separated sections:
 ## PART A: MILL VALLEY UPDATE
 
 Write a narrative briefing on what's happening in Mill Valley and Marin County on:
+
+**Housing Advisory Committee (HAC) & MVAHC**
+- Did the HAC or MVAHC meet this period? What was on the agenda?
+- Any positions taken by HAC members (McCauley, Carmel, Yolles, Hildebrand, Franklin)?
+- Any staff presentations by Patrick Kelly or Danielle Staude?
+- What is the HAC currently focused on — specific projects, policies, or state mandates?
 
 **Housing Density**
 - What proposals, decisions, or discussions happened this week?
